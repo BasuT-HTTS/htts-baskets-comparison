@@ -31,6 +31,13 @@ def get_top_and_least_correlated(correlation_matrix, top_n=10):
     corr_pairs['Pair'] = corr_pairs.apply(lambda row: tuple(sorted([row['Basket 1'], row['Basket 2']])), axis=1)
     unique_corr_pairs = corr_pairs.drop_duplicates(subset='Pair').reset_index(drop=True)
 
+    # Calculate the number of common days between each basket pair
+    unique_corr_pairs['Period (Days)'] = unique_corr_pairs.apply(
+        lambda row: (
+            (data[row['Basket 1']] != 0) & (data[row['Basket 2']] != 0)
+        ).sum()
+    , axis=1)
+
     top_corr = unique_corr_pairs.nlargest(top_n, 'Absolute Correlation')
     least_corr = unique_corr_pairs.nsmallest(top_n, 'Absolute Correlation')
     return top_corr, least_corr
@@ -75,8 +82,6 @@ plt.close('all')
 
 # Display correlation based on selection
 if basket2 == "ALL BASKETS":
-    # st.subheader(f"'{basket1}' vs 'ALL BASKETS'")
-
     # Display all correlations for basket1 in descending order
     basket_correlations = correlation_matrix[basket1].drop(basket1)  # Exclude self-correlation
     basket_correlations = basket_correlations.sort_values(ascending=False)
@@ -85,23 +90,32 @@ if basket2 == "ALL BASKETS":
     top_5_corr_baskets = basket_correlations.nlargest(5).reset_index()
     top_5_corr_baskets.columns = ['Basket', 'Correlation']
     top_5_corr_baskets['Rank'] = range(1, 6)  # Assign ranks
+    top_5_corr_baskets['Period (Days)'] = top_5_corr_baskets.apply(
+        lambda row: (
+            (data[basket1] != 0) & (data[row['Basket']] != 0)
+        ).sum(), axis=1
+    )
 
     least_5_corr_baskets = basket_correlations.nsmallest(5).reset_index()
     least_5_corr_baskets.columns = ['Basket', 'Correlation']
     least_5_corr_baskets['Rank'] = range(1, 6)  # Assign ranks
+    least_5_corr_baskets['Period (Days)'] = least_5_corr_baskets.apply(
+        lambda row: (
+            (data[basket1] != 0) & (data[row['Basket']] != 0)
+        ).sum(), axis=1
+    )
 
     col1, col2 = st.columns(2)
     
     with col1:
         # Display top 5 correlated baskets
         st.subheader(f"Top 5 Most Correlated Baskets")
-        st.dataframe(top_5_corr_baskets[['Rank', 'Basket', 'Correlation']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
+        st.dataframe(top_5_corr_baskets[['Rank', 'Basket', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
 
     with col2:
         # Display top 5 non-correlated baskets
         st.subheader("Top 5 Least Correlated Baskets")
-        # st.table(least_5_corr_baskets[['Rank', 'Basket', 'Correlation']].style.format({"Correlation": "{:.7f}"}))
-        st.dataframe(least_5_corr_baskets[['Rank', 'Basket', 'Correlation']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
+        st.dataframe(least_5_corr_baskets[['Rank', 'Basket', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
 
     # Plot a bar chart for clarity
     plt.figure(figsize=(15, 10))
@@ -116,7 +130,14 @@ if basket2 == "ALL BASKETS":
 else:
     # Display correlation between basket1 and basket2
     correlation_value = correlation_matrix.loc[basket1, basket2]
+    
+    # Calculate the number of common days between basket1 and basket2
+    period_days = (
+        (data[basket1] != 0) & (data[basket2] != 0)
+    ).sum()
+    
     st.write(f"#### Correlation Value: {correlation_value:.7f}")
+    st.write(f"#### Period (Days): {period_days}")
 
     # Display heatmap for the selected pair
     plt.figure(figsize=(8, 8))
@@ -134,12 +155,12 @@ col1, col2 = st.columns(2)
 with col1:
     # Display top 10 correlated pairs
     st.subheader("Top 10 Most Correlated Basket Pairs")
-    st.dataframe(top_corr_pairs[['Rank', 'Basket 1', 'Basket 2', 'Correlation']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
+    st.dataframe(top_corr_pairs[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
 
 with col2:
     # Display least 10 correlated pairs
     st.subheader("Top 10 Least Correlated Basket Pairs")
-    st.dataframe(least_corr_pairs[['Rank', 'Basket 1', 'Basket 2', 'Correlation']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
+    st.dataframe(least_corr_pairs[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
 
 # Display bar plots for top 10 and least 10 correlated pairs for a visual summary
 def plot_corr_pairs(df, title):
