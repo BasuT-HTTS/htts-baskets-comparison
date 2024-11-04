@@ -18,7 +18,7 @@ data.columns = [col.replace('_OVERLAY', '') for col in data.columns]
 correlation_matrix = data.corr().fillna(0)
 
 # Function to get top and least correlated pairs
-def get_top_and_least_correlated(correlation_matrix, top_n=10):
+def get_top_and_least_correlated(correlation_matrix, top_n=10, min_days=30):
     corr_pairs = (
         correlation_matrix.where(~np.eye(correlation_matrix.shape[0], dtype=bool))
         .stack()
@@ -38,12 +38,15 @@ def get_top_and_least_correlated(correlation_matrix, top_n=10):
         ).sum()
     , axis=1)
 
+    # Filter out pairs with less than min_days of common data
+    unique_corr_pairs = unique_corr_pairs[unique_corr_pairs['Period (Days)'] >= min_days]
+
     top_corr = unique_corr_pairs.nlargest(top_n, 'Absolute Correlation')
     least_corr = unique_corr_pairs.nsmallest(top_n, 'Absolute Correlation')
     return top_corr, least_corr
 
 # Get top 10 and least 10 correlated pairs
-top_corr_pairs, least_corr_pairs = get_top_and_least_correlated(correlation_matrix)
+top_corr_pairs, least_corr_pairs = get_top_and_least_correlated(correlation_matrix, min_days=10)
 
 # Sort the least correlated pairs in ascending order of correlation
 least_corr_pairs = least_corr_pairs.sort_values(by='Correlation', ascending=True)
