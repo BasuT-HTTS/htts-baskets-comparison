@@ -73,7 +73,8 @@ basket_options = sorted(correlation_matrix.columns.tolist())  # Sort basket opti
 col1, col2 = st.columns(2)
 
 with col1:
-    basket1 = st.selectbox("Select Basket 1", basket_options)
+    # basket1 = st.selectbox("Select Basket 1", basket_options)
+    basket1 = st.selectbox("Select Basket 1", basket_options, index=basket_options.index("S&P"))
 
 with col2:
     # Add "ALL BASKETS" as the first item in the selection
