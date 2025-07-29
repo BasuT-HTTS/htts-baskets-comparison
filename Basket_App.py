@@ -168,21 +168,19 @@ else:
 st.markdown("<h1 style='text-align: center;'>Global Comparison (All Baskets)</h1>", unsafe_allow_html=True)
 
 # First expandable container for Most Correlated Pairs
-with st.expander("Top 10 Most Correlated Basket Pairs", expanded=True):
+with st.expander("Top 10 Most Correlated Basket Pairs", expanded=False):
     st.dataframe(
         top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
         .style.format({"Correlation": "{:.4f}"}),
         hide_index=True,
-        use_container_width=True,
-        expanded=False
+        use_container_width=True
     )
 
 # Second expandable container for Least Correlated Pairs
-with st.expander("Top 10 Least Correlated Basket Pairs", expanded=True):
+with st.expander("Top 10 Least Correlated Basket Pairs", expanded=False):
     st.dataframe(
         least_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
         .style.format({"Correlation": "{:.4f}"}),
         hide_index=True,
-        use_container_width=True,
-        expanded=False
+        use_container_width=True
     )
