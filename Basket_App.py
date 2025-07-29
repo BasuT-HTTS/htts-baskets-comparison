@@ -10,15 +10,20 @@ sp500_data = pd.read_csv('S&P 500.csv', thousands=',')
 
 # Process S&P 500 data
 sp500_data['Date'] = pd.to_datetime(sp500_data['Date'], format='%m/%d/%Y')
-sp500_data = sp500_data.rename(columns={'Date': 'VDATE', 'Price': 'S&P 500'})
-sp500_data['S&P 500'] = sp500_data['S&P 500'].str.replace(',', '').astype(float)
+sp500_data['Price'] = sp500_data['Price'].str.replace(',', '').astype(float)
+
+# Calculate daily change (today's price - yesterday's price)
+sp500_data['S&P 500'] = sp500_data['Price'].diff()
+
+# Keep only the relevant columns and rename Date to VDATE for merging
+sp500_data = sp500_data[['Date', 'S&P 500']].rename(columns={'Date': 'VDATE'})
 
 # Process basket data
 basket_data['VDATE'] = pd.to_datetime(basket_data['VDATE'], format='%d-%m-%Y')
 basket_data = basket_data.drop(columns=['THR'], errors='ignore')  # Drop THR column if present
 
 # Merge the datasets
-data = pd.merge(basket_data, sp500_data[['VDATE', 'S&P 500']], on='VDATE', how='left')
+data = pd.merge(basket_data, sp500_data, on='VDATE', how='left')
 
 # Set date as index and drop zero-only columns
 data.set_index('VDATE', inplace=True)
