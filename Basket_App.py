@@ -173,7 +173,8 @@ with st.expander("Top 10 Most Correlated Basket Pairs", expanded=True):
         top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
         .style.format({"Correlation": "{:.4f}"}),
         hide_index=True,
-        use_container_width=True
+        use_container_width=True,
+        expanded=False
     )
 
 # Second expandable container for Least Correlated Pairs
@@ -182,5 +183,6 @@ with st.expander("Top 10 Least Correlated Basket Pairs", expanded=True):
         least_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
         .style.format({"Correlation": "{:.4f}"}),
         hide_index=True,
-        use_container_width=True
+        use_container_width=True,
+        expanded=False
     )
