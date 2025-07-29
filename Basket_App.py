@@ -105,18 +105,18 @@ if basket2 == "ALL BASKETS":
     basket_correlations = basket_correlations.sort_values(ascending=False)
 
     # Get top 5 and least 5 correlated baskets
-    top_5_corr_baskets = basket_correlations.nlargest(5).reset_index()
+    top_5_corr_baskets = basket_correlations.nlargest(10).reset_index()
     top_5_corr_baskets.columns = ['Basket', 'Correlation']
-    top_5_corr_baskets['Rank'] = range(1, 6)
+    top_5_corr_baskets['Rank'] = range(1, 11)
     top_5_corr_baskets['Period (Days)'] = top_5_corr_baskets.apply(
         lambda row: (
             (data[basket1] != 0) & (data[row['Basket']] != 0)
         ).sum(), axis=1
     )
 
-    least_5_corr_baskets = basket_correlations.nsmallest(5).reset_index()
+    least_5_corr_baskets = basket_correlations.nsmallest(10).reset_index()
     least_5_corr_baskets.columns = ['Basket', 'Correlation']
-    least_5_corr_baskets['Rank'] = range(1, 6)
+    least_5_corr_baskets['Rank'] = range(1, 11)
     least_5_corr_baskets['Period (Days)'] = least_5_corr_baskets.apply(
         lambda row: (
             (data[basket1] != 0) & (data[row['Basket']] != 0)
@@ -126,11 +126,11 @@ if basket2 == "ALL BASKETS":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader(f"Top 5 Most Correlated Baskets")
+        st.subheader(f"Top 10 Most Correlated Baskets with S&P")
         st.dataframe(top_5_corr_baskets[['Rank', 'Basket', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.4f}"}), hide_index=True)
 
     with col2:
-        st.subheader("Top 5 Least Correlated Baskets")
+        st.subheader("Top 10 Least Correlated Baskets with S&P")
         st.dataframe(least_5_corr_baskets[['Rank', 'Basket', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.4f}"}), hide_index=True)
 
     # Updated bar plot with hue parameter
