@@ -10,28 +10,26 @@ sp500_data = pd.read_csv('S&P 500.csv', thousands=',')
 
 # Process S&P 500 data
 sp500_data['Date'] = pd.to_datetime(sp500_data['Date'], format='%m/%d/%Y')
-
-# Convert Price to numeric (handles commas if present)
 sp500_data['Price'] = pd.to_numeric(sp500_data['Price'].astype(str).str.replace(',', ''), errors='coerce')
-
-# Calculate daily change (today's price - yesterday's price)
 sp500_data['S&P 500'] = sp500_data['Price'].diff()
-
-# Keep only the relevant columns and rename Date to VDATE for merging
 sp500_data = sp500_data[['Date', 'S&P 500']].rename(columns={'Date': 'VDATE'})
 
 # Process basket data
 basket_data['VDATE'] = pd.to_datetime(basket_data['VDATE'], format='%d-%m-%Y')
-basket_data = basket_data.drop(columns=['THR'], errors='ignore')  # Drop THR column if present
+basket_data = basket_data.drop(columns=['THR'], errors='ignore')
 
-# Merge the datasets
+# Merge datasets
 data = pd.merge(basket_data, sp500_data, on='VDATE', how='left')
-
-# Set date as index and drop zero-only columns
 data.set_index('VDATE', inplace=True)
-data = data.loc[:, (data != 0).any(axis=0)]  # Drop zero-only columns
 
-# Remove _OVERLAY from column names
+# Filter out baskets without recent data (last 20 days)
+recent_cutoff = data.index.max() - pd.Timedelta(days=20)
+active_baskets = [col for col in data.columns 
+                 if (data[col].last('20D') != 0).any()]
+data = data[active_baskets]
+
+# Remove zero-only columns and _OVERLAY from names
+data = data.loc[:, (data != 0).any(axis=0)]
 data.columns = [col.replace('_OVERLAY', '') for col in data.columns]
 
 # Compute correlation matrix
