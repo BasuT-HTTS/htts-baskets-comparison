@@ -166,43 +166,11 @@ st.header("Global Comparison (All Baskets)")
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("Top 5 Most Correlated Basket Pairs")
-    st.dataframe(top_corr_pairs.head(5)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
+    st.subheader("Top 10 Most Correlated Basket Pairs")
+    st.dataframe(top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
                 .style.format({"Correlation": "{:.4f}"}), hide_index=True)
 
 with col2:
-    st.subheader("Top 5 Least Correlated Basket Pairs")
-    st.dataframe(least_corr_pairs.head(5)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
+    st.subheader("Top 10 Least Correlated Basket Pairs")
+    st.dataframe(least_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
                 .style.format({"Correlation": "{:.4f}"}), hide_index=True)
-
-# Create a single row for both plots
-st.subheader("Correlation Comparison")
-col1, col2 = st.columns(2)
-
-with col1:
-    # Plot top 5 most correlated
-    plt.figure(figsize=(10, 5))
-    top_5 = top_corr_pairs.head(5)
-    y_values = top_5['Basket 1'] + " vs " + top_5['Basket 2']
-    sns.barplot(x='Correlation', y=y_values, hue=y_values, data=top_5, 
-                palette="coolwarm", legend=False)
-    plt.title("Top 5 Most Correlated Pairs")
-    plt.xlabel("Correlation")
-    plt.ylabel("")
-    plt.tight_layout()
-    st.pyplot(plt)
-    plt.close()
-
-with col2:
-    # Plot top 5 least correlated
-    plt.figure(figsize=(10, 5))
-    least_5 = least_corr_pairs.head(5)
-    y_values = least_5['Basket 1'] + " vs " + least_5['Basket 2']
-    sns.barplot(x='Correlation', y=y_values, hue=y_values, data=least_5, 
-                palette="coolwarm_r", legend=False)
-    plt.title("Top 5 Least Correlated Pairs")
-    plt.xlabel("Correlation")
-    plt.ylabel("")
-    plt.tight_layout()
-    st.pyplot(plt)
-    plt.close()
