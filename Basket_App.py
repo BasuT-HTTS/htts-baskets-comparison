@@ -127,11 +127,11 @@ if basket2 == "ALL BASKETS":
     
     with col1:
         st.subheader(f"Top 5 Most Correlated Baskets")
-        st.dataframe(top_5_corr_baskets[['Rank', 'Basket', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
+        st.dataframe(top_5_corr_baskets[['Rank', 'Basket', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.4f}"}), hide_index=True)
 
     with col2:
         st.subheader("Top 5 Least Correlated Baskets")
-        st.dataframe(least_5_corr_baskets[['Rank', 'Basket', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
+        st.dataframe(least_5_corr_baskets[['Rank', 'Basket', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.4f}"}), hide_index=True)
 
     # Updated bar plot with hue parameter
     plt.figure(figsize=(15, 10))
@@ -148,12 +148,12 @@ else:
     correlation_value = correlation_matrix.loc[basket1, basket2]
     period_days = ((data[basket1] != 0) & (data[basket2] != 0)).sum()
     
-    st.write(f"#### Correlation Value: {correlation_value:.7f}")
+    st.write(f"#### Correlation Value: {correlation_value:.4f}")
     st.write(f"#### Period (Days): {period_days}")
 
     plt.figure(figsize=(8, 8))
     sns.heatmap(correlation_matrix.loc[[basket1, basket2], [basket1, basket2]], 
-                annot=True, fmt='.7f', cmap="RdBu_r", center=0, vmin=-1, vmax=1)
+                annot=True, fmt='.4f', cmap="RdBu_r", center=0, vmin=-1, vmax=1)
     plt.title(f"{basket1} vs {basket2}", pad=20)
     plt.tight_layout()
     st.pyplot(plt)
@@ -165,11 +165,11 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Top 10 Most Correlated Basket Pairs")
-    st.dataframe(top_corr_pairs[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
+    st.dataframe(top_corr_pairs[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.4f}"}), hide_index=True)
 
 with col2:
     st.subheader("Top 10 Least Correlated Basket Pairs")
-    st.dataframe(least_corr_pairs[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
+    st.dataframe(least_corr_pairs[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.4f}"}), hide_index=True)
 
 # Updated plot_corr_pairs function with hue parameter
 def plot_corr_pairs(df, title):
