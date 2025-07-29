@@ -84,8 +84,11 @@ start_date = data.index.min().strftime('%d-%m-%Y')
 end_date = data.index.max().strftime('%d-%m-%Y')
 
 # Streamlit app title with date range
-st.header(f"Basket Co-Relation Comparison [{start_date} to {end_date}]")
-
+# st.header(f"Basket Co-Relation Comparison [{start_date} to {end_date}]")
+st.markdown(
+    f"<h1 style='text-align: center;'>Basket Co-Relation Comparison [{start_date} to {end_date}]</h1>", 
+    unsafe_allow_html=True
+)
 # Selection of baskets in the same row
 basket_options = sorted(correlation_matrix.columns.tolist())
 col1, col2 = st.columns(2)
