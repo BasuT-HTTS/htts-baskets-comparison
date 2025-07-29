@@ -167,10 +167,36 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Top 10 Most Correlated Basket Pairs")
-    st.dataframe(top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
-                .style.format({"Correlation": "{:.4f}"}), hide_index=True)
+    # st.dataframe(top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
+    #             .style.format({"Correlation": "{:.4f}"}), hide_index=True)
+    st.dataframe(
+        top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']],
+        column_config={
+            "Rank": st.column_config.NumberColumn(width="small"),
+            "Basket 1": st.column_config.TextColumn(width="medium"),
+            "Basket 2": st.column_config.TextColumn(width="medium"),
+            "Correlation": st.column_config.NumberColumn(format="%.4f", width="small"),
+            "Period (Days)": st.column_config.NumberColumn(width="small")
+        },
+        hide_index=True,
+        use_container_width=True,
+        height=((10 + 1) * 35 + 3)  # 5 rows * 35px + header
+    )
 
 with col2:
     st.subheader("Top 10 Least Correlated Basket Pairs")
-    st.dataframe(least_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
-                .style.format({"Correlation": "{:.4f}"}), hide_index=True)
+    # st.dataframe(least_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
+    #             .style.format({"Correlation": "{:.4f}"}), hide_index=True)
+    st.dataframe(
+        top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']],
+        column_config={
+            "Rank": st.column_config.NumberColumn(width="small"),
+            "Basket 1": st.column_config.TextColumn(width="medium"),
+            "Basket 2": st.column_config.TextColumn(width="medium"),
+            "Correlation": st.column_config.NumberColumn(format="%.4f", width="small"),
+            "Period (Days)": st.column_config.NumberColumn(width="small")
+        },
+        hide_index=True,
+        use_container_width=True,
+        height=((10 + 1) * 35 + 3)  # 5 rows * 35px + header
+    )
