@@ -167,26 +167,20 @@ else:
 # st.header("Global Comparison (All Baskets)")
 st.markdown("<h1 style='text-align: center;'>Global Comparison (All Baskets)</h1>", unsafe_allow_html=True)
 
-# Create an expander container
-with st.expander("Global Basket Correlations", expanded=True):
-    # First row - Most Correlated
-    st.subheader("Top 10 Most Correlated Basket Pairs")
+# First expandable container for Most Correlated Pairs
+with st.expander("Top 10 Most Correlated Basket Pairs", expanded=True):
     st.dataframe(
         top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
         .style.format({"Correlation": "{:.4f}"}),
         hide_index=True,
         use_container_width=True
     )
-    
-    # Add some vertical spacing
-    st.write("")  
-    st.write("")  
-    
-    # Second row - Least Correlated
-    st.subheader("Top 10 Least Correlated Basket Pairs")
+
+# Second expandable container for Least Correlated Pairs
+with st.expander("Top 10 Least Correlated Basket Pairs", expanded=True):
     st.dataframe(
         least_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
         .style.format({"Correlation": "{:.4f}"}),
-        hide_container_width=True,
-        hide_index=True
+        hide_index=True,
+        use_container_width=True
     )
