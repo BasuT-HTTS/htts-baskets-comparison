@@ -161,7 +161,8 @@ else:
 
 # Replace the last part of your code (the global comparison section) with this:
 
-st.header("Global Comparison (All Baskets)")
+# st.header("Global Comparison (All Baskets)")
+st.markdown("<h1 style='text-align: center;'>Global Comparison (All Baskets)</h1>", unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
