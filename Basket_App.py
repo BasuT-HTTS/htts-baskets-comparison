@@ -10,7 +10,9 @@ sp500_data = pd.read_csv('S&P 500.csv', thousands=',')
 
 # Process S&P 500 data
 sp500_data['Date'] = pd.to_datetime(sp500_data['Date'], format='%m/%d/%Y')
-sp500_data['Price'] = sp500_data['Price'].str.replace(',', '').astype(float)
+
+# Convert Price to numeric (handles commas if present)
+sp500_data['Price'] = pd.to_numeric(sp500_data['Price'].astype(str).str.replace(',', ''), errors='coerce')
 
 # Calculate daily change (today's price - yesterday's price)
 sp500_data['S&P 500'] = sp500_data['Price'].diff()
