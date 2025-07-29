@@ -167,40 +167,26 @@ else:
 # st.header("Global Comparison (All Baskets)")
 st.markdown("<h1 style='text-align: center;'>Global Comparison (All Baskets)</h1>", unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
-
-with col1:
+# Create an expander container
+with st.expander("Global Basket Correlations", expanded=True):
+    # First row - Most Correlated
     st.subheader("Top 10 Most Correlated Basket Pairs")
-    # st.dataframe(top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
-    #             .style.format({"Correlation": "{:.4f}"}), hide_index=True)
     st.dataframe(
-        top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']],
-        column_config={
-            "Rank": st.column_config.NumberColumn(width="small"),
-            "Basket 1": st.column_config.TextColumn(width="medium"),
-            "Basket 2": st.column_config.TextColumn(width="medium"),
-            "Correlation": st.column_config.NumberColumn(format="%.4f", width="small"),
-            "Period (Days)": st.column_config.NumberColumn(width="small")
-        },
+        top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
+        .style.format({"Correlation": "{:.4f}"}),
         hide_index=True,
-        use_container_width=True,
-        height=((10 + 1) * 35 + 3)  # 5 rows * 35px + header
+        use_container_width=True
     )
-
-with col2:
+    
+    # Add some vertical spacing
+    st.write("")  
+    st.write("")  
+    
+    # Second row - Least Correlated
     st.subheader("Top 10 Least Correlated Basket Pairs")
-    # st.dataframe(least_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
-    #             .style.format({"Correlation": "{:.4f}"}), hide_index=True)
     st.dataframe(
-        top_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']],
-        column_config={
-            "Rank": st.column_config.NumberColumn(width="small"),
-            "Basket 1": st.column_config.TextColumn(width="medium"),
-            "Basket 2": st.column_config.TextColumn(width="medium"),
-            "Correlation": st.column_config.NumberColumn(format="%.4f", width="small"),
-            "Period (Days)": st.column_config.NumberColumn(width="small")
-        },
-        hide_index=True,
-        use_container_width=True,
-        height=((10 + 1) * 35 + 3)  # 5 rows * 35px + header
+        least_corr_pairs.head(10)[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']]
+        .style.format({"Correlation": "{:.4f}"}),
+        hide_container_width=True,
+        hide_index=True
     )
