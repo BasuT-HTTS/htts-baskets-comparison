@@ -25,7 +25,7 @@ data.set_index('VDATE', inplace=True)
 # Filter out baskets without recent data (last 20 days)
 recent_cutoff = data.index.max() - pd.Timedelta(days=20)
 active_baskets = [col for col in data.columns 
-                 if (data[col].last('20D') != 0).any()]
+                 if ((data.index >= recent_cutoff) & (data[col] != 0)).any()]
 data = data[active_baskets]
 
 # Remove zero-only columns and _OVERLAY from names
@@ -87,13 +87,12 @@ end_date = data.index.max().strftime('%d-%m-%Y')
 st.header(f"Basket Co-Relation Comparison [{start_date} to {end_date}]")
 
 # Selection of baskets in the same row
-basket_options = sorted(correlation_matrix.columns.tolist())  # Sort basket options alphabetically
+basket_options = sorted(correlation_matrix.columns.tolist())
 col1, col2 = st.columns(2)
 
 with col1:
-    basket1 = st.selectbox("Select Basket 1", basket_options, index=basket_options.index("S&P 500"))
+    basket1 = st.selectbox("Select Basket 1", basket_options, index=basket_options.index("S&P 500") if "S&P 500" in basket_options else 0)
 with col2:
-    # Add "ALL BASKETS" as the first item in the selection
     basket2_options = ["ALL BASKETS"] + [b for b in basket_options if b != basket1]
     basket2 = st.selectbox("Select Basket 2", basket2_options)
 
@@ -102,14 +101,13 @@ plt.close('all')
 
 # Display correlation based on selection
 if basket2 == "ALL BASKETS":
-    # Display all correlations for basket1 in descending order
-    basket_correlations = correlation_matrix[basket1].drop(basket1)  # Exclude self-correlation
+    basket_correlations = correlation_matrix[basket1].drop(basket1)
     basket_correlations = basket_correlations.sort_values(ascending=False)
 
     # Get top 5 and least 5 correlated baskets
     top_5_corr_baskets = basket_correlations.nlargest(5).reset_index()
     top_5_corr_baskets.columns = ['Basket', 'Correlation']
-    top_5_corr_baskets['Rank'] = range(1, 6)  # Assign ranks
+    top_5_corr_baskets['Rank'] = range(1, 6)
     top_5_corr_baskets['Period (Days)'] = top_5_corr_baskets.apply(
         lambda row: (
             (data[basket1] != 0) & (data[row['Basket']] != 0)
@@ -118,7 +116,7 @@ if basket2 == "ALL BASKETS":
 
     least_5_corr_baskets = basket_correlations.nsmallest(5).reset_index()
     least_5_corr_baskets.columns = ['Basket', 'Correlation']
-    least_5_corr_baskets['Rank'] = range(1, 6)  # Assign ranks
+    least_5_corr_baskets['Rank'] = range(1, 6)
     least_5_corr_baskets['Period (Days)'] = least_5_corr_baskets.apply(
         lambda row: (
             (data[basket1] != 0) & (data[row['Basket']] != 0)
@@ -128,18 +126,17 @@ if basket2 == "ALL BASKETS":
     col1, col2 = st.columns(2)
     
     with col1:
-        # Display top 5 correlated baskets
         st.subheader(f"Top 5 Most Correlated Baskets")
         st.dataframe(top_5_corr_baskets[['Rank', 'Basket', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
 
     with col2:
-        # Display top 5 non-correlated baskets
         st.subheader("Top 5 Least Correlated Baskets")
         st.dataframe(least_5_corr_baskets[['Rank', 'Basket', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
 
-    # Plot a bar chart for clarity
+    # Updated bar plot with hue parameter
     plt.figure(figsize=(15, 10))
-    sns.barplot(x=basket_correlations.values, y=basket_correlations.index, palette="coolwarm")
+    sns.barplot(x=basket_correlations.values, y=basket_correlations.index, 
+                hue=basket_correlations.index, palette="coolwarm", legend=False)
     plt.title(f"Correlation of '{basket1}' with All Other Baskets", pad=20)
     plt.xlabel("Correlation")
     plt.ylabel("Baskets")
@@ -148,18 +145,12 @@ if basket2 == "ALL BASKETS":
     plt.close()
 
 else:
-    # Display correlation between basket1 and basket2
     correlation_value = correlation_matrix.loc[basket1, basket2]
-    
-    # Calculate the number of common days between basket1 and basket2
-    period_days = (
-        (data[basket1] != 0) & (data[basket2] != 0)
-    ).sum()
+    period_days = ((data[basket1] != 0) & (data[basket2] != 0)).sum()
     
     st.write(f"#### Correlation Value: {correlation_value:.7f}")
     st.write(f"#### Period (Days): {period_days}")
 
-    # Display heatmap for the selected pair
     plt.figure(figsize=(8, 8))
     sns.heatmap(correlation_matrix.loc[[basket1, basket2], [basket1, basket2]], 
                 annot=True, fmt='.7f', cmap="RdBu_r", center=0, vmin=-1, vmax=1)
@@ -173,19 +164,19 @@ st.header("Global Comparison (All Baskets)")
 col1, col2 = st.columns(2)
 
 with col1:
-    # Display top 10 correlated pairs
     st.subheader("Top 10 Most Correlated Basket Pairs")
     st.dataframe(top_corr_pairs[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
 
 with col2:
-    # Display least 10 correlated pairs
     st.subheader("Top 10 Least Correlated Basket Pairs")
     st.dataframe(least_corr_pairs[['Rank', 'Basket 1', 'Basket 2', 'Correlation', 'Period (Days)']].style.format({"Correlation": "{:.7f}"}), hide_index=True)
 
-# Display bar plots for top 10 and least 10 correlated pairs for a visual summary
+# Updated plot_corr_pairs function with hue parameter
 def plot_corr_pairs(df, title):
     plt.figure(figsize=(15, 8))
-    sns.barplot(x='Correlation', y=df['Basket 1'] + " vs " + df['Basket 2'], data=df, palette="coolwarm")
+    y_values = df['Basket 1'] + " vs " + df['Basket 2']
+    sns.barplot(x='Correlation', y=y_values, hue=y_values, data=df, 
+                palette="coolwarm", legend=False)
     plt.title(title, pad=20)
     plt.xlabel("Correlation")
     plt.ylabel("Basket Pairs")
