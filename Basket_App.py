@@ -4,11 +4,24 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Load data
-data = pd.read_csv('LIVE_BASKETS.csv', thousands=',')
-data['VDATE'] = pd.to_datetime(data['VDATE'], format='%d-%m-%Y')
+# Load data from both files
+basket_data = pd.read_csv('LIVE_BASKETS.csv', thousands=',')
+sp500_data = pd.read_csv('S&P 500.csv', thousands=',')
+
+# Process S&P 500 data
+sp500_data['Date'] = pd.to_datetime(sp500_data['Date'], format='%m/%d/%Y')
+sp500_data = sp500_data.rename(columns={'Date': 'VDATE', 'Price': 'S&P 500'})
+sp500_data['S&P 500'] = sp500_data['S&P 500'].str.replace(',', '').astype(float)
+
+# Process basket data
+basket_data['VDATE'] = pd.to_datetime(basket_data['VDATE'], format='%d-%m-%Y')
+basket_data = basket_data.drop(columns=['THR'], errors='ignore')  # Drop THR column if present
+
+# Merge the datasets
+data = pd.merge(basket_data, sp500_data[['VDATE', 'S&P 500']], on='VDATE', how='left')
+
+# Set date as index and drop zero-only columns
 data.set_index('VDATE', inplace=True)
-data = data.drop(columns=['THR'], errors='ignore')  # Drop THR column if present
 data = data.loc[:, (data != 0).any(axis=0)]  # Drop zero-only columns
 
 # Remove _OVERLAY from column names
@@ -73,7 +86,6 @@ basket_options = sorted(correlation_matrix.columns.tolist())  # Sort basket opti
 col1, col2 = st.columns(2)
 
 with col1:
-    # basket1 = st.selectbox("Select Basket 1", basket_options)
     basket1 = st.selectbox("Select Basket 1", basket_options, index=basket_options.index("S&P 500"))
 with col2:
     # Add "ALL BASKETS" as the first item in the selection
