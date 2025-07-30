@@ -140,7 +140,7 @@ if basket2 == "ALL BASKETS":
     plt.figure(figsize=(15, 10))
     sns.barplot(x=basket_correlations.values, y=basket_correlations.index, 
                 hue=basket_correlations.index, palette="coolwarm", legend=False)
-    plt.title(f"Correlation of '{basket1}' with Active Baskets (in Last 20 Days)", pad=20)
+    plt.title(f"Correlation of '{basket1}' with All Baskets (Active in Last 20 Days)", pad=20)
     plt.xlabel("Correlation")
     plt.ylabel("Baskets")
     plt.tight_layout()
